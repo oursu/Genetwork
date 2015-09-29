@@ -1,3 +1,4 @@
+
 get_click_coords=function(){
   coords <- locator(type="l")
   return(coords)
@@ -98,7 +99,7 @@ plot_bedpe_scores=function(bedpe,midpoint,chromo,mini,maxi,
                            xbeds=data.frame(chr=character(),start=numeric(),
                                             end=numeric(),name=character()),
                            ybeds=data.frame(chr=character(),start=numeric(),
-                           end=numeric(),name=character())){
+                                            end=numeric(),name=character())){
   require(ggplot2)
   require(gridExtra)
   g_legend<-function(a.gplot){
@@ -113,18 +114,18 @@ plot_bedpe_scores=function(bedpe,midpoint,chromo,mini,maxi,
   
   
   if (dim(xbeds)[1]==0 && (dim(ybeds)[1]==0)){
-   print(ggplot(bedpe, aes(x=mid1, y=mid2, fill = log(value,base=2))) + 
-          geom_tile(aes(width = w2, height=w1))+
-          xlab('X coordinate')+ 
-          ylab('Y coordinate')+
-          geom_vline(xintercept = mini)+
-          geom_vline(xintercept = maxi)+
-          geom_hline(yintercept = mini)+
-          geom_hline(yintercept = maxi)+
-          xlim(mini,maxi)+
-          ylim(mini,maxi)+
-          theme_bw()+ 
-          scale_fill_gradient2(low="blue", midpoint=midpoint,high="red",limits=c(-5,5)))
+    print(ggplot(bedpe, aes(x=mid1, y=mid2, fill = log(value,base=2))) + 
+            geom_tile(aes(width = w2, height=w1))+
+            xlab('X coordinate')+ 
+            ylab('Y coordinate')+
+            geom_vline(xintercept = mini)+
+            geom_vline(xintercept = maxi)+
+            geom_hline(yintercept = mini)+
+            geom_hline(yintercept = maxi)+
+            xlim(mini,maxi)+
+            ylim(mini,maxi)+
+            theme_bw()+ 
+            scale_fill_gradient2(low="blue", midpoint=midpoint,high="red",limits=c(-5,5)))
   }
   if ((dim(xbeds)[1]>0) && (dim(ybeds)[1]>0)){
     print(chromo)
@@ -182,4 +183,24 @@ plot_bedpe_to_pdf=function(bedpefile,chromo,mini,maxi,centervalue,out,
 }
 
 
+#=======================================
+args=commandArgs(trailingOnly=TRUE)
+inbedpe=args[1]
+chromo=args[2]
+mini=args[3]
+maxi=args[4]
+out=args[6]
+xbed_files=args[7]
+ybed_files=args[8]
 
+xbeds=ybeds=data.frame(chr=character(),start=numeric(),
+                 end=numeric(),name=character())
+for (xbed in xbed_files){
+  xbeds=rbind(read_bed(xbed),xbeds)
+}
+for (ybed in ybed_files){
+  ybeds=rbind(read_bed(ybed),ybeds)
+}
+
+plot_bedpe_to_pdf(inbedpe,chromo,mini,maxi,0,paste(out,'.pdf',sep=''),
+                  xbeds,ybeds)
