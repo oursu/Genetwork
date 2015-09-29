@@ -1,3 +1,4 @@
+require("labeling",lib="/srv/scratch/oursu/code/")
 
 get_click_coords=function(){
   coords <- locator(type="l")
@@ -100,8 +101,8 @@ plot_bedpe_scores=function(bedpe,midpoint,chromo,mini,maxi,
                                             end=numeric(),name=character()),
                            ybeds=data.frame(chr=character(),start=numeric(),
                                             end=numeric(),name=character())){
-  require(ggplot2)
-  require(gridExtra)
+  require("ggplot2",lib.loc="/srv/scratch/oursu/code/")
+  require("gridExtra",lib.loc="/srv/scratch/oursu/code/")
   g_legend<-function(a.gplot){
     tmp <- ggplot_gtable(ggplot_build(a.gplot))
     leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
@@ -136,10 +137,12 @@ plot_bedpe_scores=function(bedpe,midpoint,chromo,mini,maxi,
     stopifnot(length(chromoy)>0)
     xbeds=xbeds[chromox,]
     ybeds=ybeds[chromoy,]
+    print('1')
     #I'll assume that in this case the user has inputted a good bed file
     bottom_start=ggplot(xbeds,aes(name,start,ymin=start,ymax=end,colour=name))+geom_linerange(size=10)+theme_bw()+xlab("")+ylab("")+coord_flip()
     bottom=bottom_start+guides(colour=FALSE)+theme(axis.ticks=element_blank(), axis.text.y=element_blank())+ylim(c(mini,maxi))
     #side plot
+    print('2')
     theheatmap=ggplot(bedpe, aes(x=mid1, y=mid2, fill = log(value,base=2))) + 
       geom_tile(aes(width = w2, height=w1))+
       xlab('X coordinate')+ 
@@ -154,10 +157,12 @@ plot_bedpe_scores=function(bedpe,midpoint,chromo,mini,maxi,
       theme_bw()+
       theme(axis.ticks= element_blank(),axis.text.y = element_blank())+
       scale_fill_gradient2(low="blue", midpoint=midpoint,high="red",limits=c(-5,5))
+    print('3')
     side=ggplot(ybeds,aes(name,start,ymin=start,ymax=end,colour=name))+geom_linerange(size=10)+theme_bw()+xlab("")+ylab("")+guides(colour=FALSE)+ylim(c(mini,maxi))
+    print('4')
     grid.arrange(side,theheatmap, g_legend(bottom_start),bottom,ncol=2, nrow=2,
-                 main =paste(chromo,':',mini,'-',maxi,sep=''),
                  heights=c(5,1.5), widths=c(1.5,5))    
+   print('5')
   }
 }
 
@@ -185,22 +190,28 @@ plot_bedpe_to_pdf=function(bedpefile,chromo,mini,maxi,centervalue,out,
 
 #=======================================
 args=commandArgs(trailingOnly=TRUE)
+print(args)
 inbedpe=args[1]
 chromo=args[2]
 mini=args[3]
 maxi=args[4]
-out=args[6]
-xbed_files=args[7]
-ybed_files=args[8]
+out=args[5]
+xbed_files=strsplit(args[6],',')[[1]]
+ybed_files=strsplit(args[7],',')[[1]]
 
+print(xbed_files)
+print(ybed_files)
 xbeds=ybeds=data.frame(chr=character(),start=numeric(),
                  end=numeric(),name=character())
 for (xbed in xbed_files){
-  xbeds=rbind(read_bed(xbed),xbeds)
+    print(head(read_bed(xbed,basename(xbed))))
+  xbeds=rbind(read_bed(xbed,basename(xbed)),xbeds)
 }
+print('done x')
 for (ybed in ybed_files){
-  ybeds=rbind(read_bed(ybed),ybeds)
+    print(head(read_bed(ybed,basename(ybed))))
+  ybeds=rbind(read_bed(ybed,basename(ybed)),ybeds)
 }
 
-plot_bedpe_to_pdf(inbedpe,chromo,mini,maxi,0,paste(out,'.pdf',sep=''),
+plot_bedpe_to_pdf(inbedpe,chromo,as.numeric(mini),as.numeric(maxi),0,paste(out,'.pdf',sep=''),
                   xbeds,ybeds)
