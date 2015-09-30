@@ -112,7 +112,8 @@ plot_bedpe_scores=function(bedpe,midpoint,chromo,mini,maxi,
   
   #mini=min(c(bedpe$start1,bedpe$start2))
   #maxi=max(c(bedpe$end1,bedpe$end2))
-  
+  MIN=-3
+  MAX=3  
   
   if (dim(xbeds)[1]==0 && (dim(ybeds)[1]==0)){
     print(ggplot(bedpe, aes(x=mid1, y=mid2, fill = log(value,base=2))) + 
@@ -126,7 +127,7 @@ plot_bedpe_scores=function(bedpe,midpoint,chromo,mini,maxi,
             xlim(mini,maxi)+
             ylim(mini,maxi)+
             theme_bw()+ 
-            scale_fill_gradient2(low="blue", midpoint=midpoint,high="red",limits=c(-5,5)))
+            scale_fill_gradient2(low="blue", midpoint=midpoint,high="red",limits=c(MIN,MAX)))
   }
   if ((dim(xbeds)[1]>0) && (dim(ybeds)[1]>0)){
     print(chromo)
@@ -156,12 +157,12 @@ plot_bedpe_scores=function(bedpe,midpoint,chromo,mini,maxi,
       guides(fill=FALSE)+
       theme_bw()+
       theme(axis.ticks= element_blank(),axis.text.y = element_blank())+
-      scale_fill_gradient2(low="blue", midpoint=midpoint,high="red",limits=c(-5,5))
+      scale_fill_gradient2(low="blue", midpoint=midpoint,high="red",limits=c(MIN,MAX))
     print('3')
     side=ggplot(ybeds,aes(name,start,ymin=start,ymax=end,colour=name))+geom_linerange(size=10)+theme_bw()+xlab("")+ylab("")+guides(colour=FALSE)+ylim(c(mini,maxi))
     print('4')
     grid.arrange(side,theheatmap, g_legend(bottom_start),bottom,ncol=2, nrow=2,
-                 heights=c(5,1.5), widths=c(1.5,5))    
+                 heights=c(5,1), widths=c(1,5))    
    print('5')
   }
 }

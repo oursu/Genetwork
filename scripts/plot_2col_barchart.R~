@@ -1,0 +1,13 @@
+
+args=commandArgs(trailingOnly=TRUE)
+
+f=args[1]
+out=args[2]
+
+print("starting")
+data=read.table(f,header=TRUE)
+print(data)
+
+pdf(out)
+barchart(data)
+dev.off()
