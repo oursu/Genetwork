@@ -4,14 +4,18 @@
 \alias{get_rectangularized_coords}
 \title{Convert click coordinates to rectangles.
 This function assumes that click coordinates are given in pairs
-The first click is the top left, and the second click is the bottom right}
+The first click is the lower left, and the second click is the top right}
 \usage{
-get_rectangularized_coords(coords, chromo, gendist, mini)
+get_rectangularized_coords(coords, chromo, mini, maxi)
 }
 \arguments{
 \item{coords}{The coordinates object received from pairs of clicks identifying rectangles.}
 
 \item{chromo}{Current chromosome for the rectangles (for making a bedpe file of rectangles).}
+
+\item{mini}{Minimum coordinate in the figure (important for the conversion from pixels to genomic coordinates)}
+
+\item{maxi}{Maximum coordinate in the figure}
 }
 \value{
 A bedpe data frame with rectangles (first bedpe entry is the y axis, second bedpe entry is the x axis)
@@ -19,11 +23,6 @@ A bedpe data frame with rectangles (first bedpe entry is the y axis, second bedp
 \description{
 Convert click coordinates to rectangles.
 This function assumes that click coordinates are given in pairs
-The first click is the top left, and the second click is the bottom right
-}
-\examples{
-a=data.frame(a=c(1,2,3),b=c(2,3,4),d=c(3,4,5))
-coords_out=get_coords_heatmap(a)
-get_rectangularized_coords(coords_out,'chr1')
+The first click is the lower left, and the second click is the top right
 }
 

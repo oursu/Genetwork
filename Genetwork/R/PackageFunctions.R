@@ -12,7 +12,6 @@ get_click_coords=function(){
 #' @param mini Minimum coordinate in the figure (important for the conversion from pixels to genomic coordinates)
 #' @param maxi Maximum coordinate in the figure
 #' @return A bedpe data frame with rectangles (first bedpe entry is the y axis, second bedpe entry is the x axis)
-#' @examples
 get_rectangularized_coords=function(coords,chromo,mini,maxi){
   print('get_rectangularized_coords')
   #need to have some coordinates
