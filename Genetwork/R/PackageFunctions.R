@@ -198,7 +198,7 @@ plot_bedpe_to_pdf=function(bedpefile,chromo,mini,maxi,centervalue,out,
 #' @param pref The prefix of the files that will be created. Useful for when the same method 
 #' will be run for finding different types of elements, e.g. TADs, loops, etc., then 
 #' you can just set the prefix to "TADs", "Loops", etc.
-#' @examples bedpe_to_rectangles_byChromosome('/srv/scratch/oursu/3Dgenome/results/processed_data/HiC/counts/intra/GM12878_combined/5kb/chr21/windowData/wWINDOW/chr21_5kb.RAWobserved.norm_SQRTVC.obsOverExp_SQRTVCexpected.wMINI.gz','chr21',30000000,39000000,0,1000000)
+#' @examples bedpe_to_rectangles_byChromosome('/srv/scratch/oursu/3Dgenome/results/processed_data/HiC/counts/intra/GM12878_combined/5kb/chr21/windowData/wWINDOW/chr21_5kb.RAWobserved.norm_SQRTVC.obsOverExp_SQRTVCexpected.wMINI.gz','chr21',30000000,39000000,1000000,outdir,outpref)
 bedpe_to_rectangles_byChromosome=function(bedpefile,chromo,mini,maxi,w,outdir,pref){
   for (cur_mini in seq(from=mini,to=maxi,by=w)){
     print(cur_mini)
