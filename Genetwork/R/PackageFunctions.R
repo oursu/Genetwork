@@ -13,9 +13,6 @@ get_click_coords=function(){
 #' @param maxi Maximum coordinate in the figure
 #' @return A bedpe data frame with rectangles (first bedpe entry is the y axis, second bedpe entry is the x axis)
 #' @examples
-#' a=data.frame(a=c(1,2,3),b=c(2,3,4),d=c(3,4,5))
-#' coords_out=get_coords_heatmap(a)
-#' get_rectangularized_coords(coords_out,'chr1',1,4)
 get_rectangularized_coords=function(coords,chromo,mini,maxi){
   print('get_rectangularized_coords')
   #need to have some coordinates
@@ -81,7 +78,7 @@ read_bedpe=function(bedpefile){
 
 read_bed=function(bedfile,featurename){
   bed=read.table(bedfile)
-  bed=data.frame(chr=bed[,1],start=bed[,2],end=bed[,3],name=featurename)
+  bed=data.frame(chr=bed[,1],start=bed[,2],end=bed[,3],featurename)
   return(bed)
 }
 
@@ -98,9 +95,9 @@ plot_bedpe_scores=function(bedpe,midpoint,chromo,mini,maxi,
                            xbeds=data.frame(chr=character(),start=numeric(),
                                             end=numeric(),name=character()),
                            ybeds=data.frame(chr=character(),start=numeric(),
-                           end=numeric(),name=character())){
-  require(ggplot2)
-  require(gridExtra)
+                                            end=numeric(),name=character())){
+  require("ggplot2",lib.loc="/srv/scratch/oursu/code/")
+  require("gridExtra",lib.loc="/srv/scratch/oursu/code/")
   g_legend<-function(a.gplot){
     tmp <- ggplot_gtable(ggplot_build(a.gplot))
     leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
@@ -110,21 +107,22 @@ plot_bedpe_scores=function(bedpe,midpoint,chromo,mini,maxi,
   
   #mini=min(c(bedpe$start1,bedpe$start2))
   #maxi=max(c(bedpe$end1,bedpe$end2))
-  
+  MIN=-3
+  MAX=3  
   
   if (dim(xbeds)[1]==0 && (dim(ybeds)[1]==0)){
-   print(ggplot(bedpe, aes(x=mid1, y=mid2, fill = log(value,base=2))) + 
-          geom_tile(aes(width = w2, height=w1))+
-          xlab('X coordinate')+ 
-          ylab('Y coordinate')+
-          geom_vline(xintercept = mini)+
-          geom_vline(xintercept = maxi)+
-          geom_hline(yintercept = mini)+
-          geom_hline(yintercept = maxi)+
-          xlim(mini,maxi)+
-          ylim(mini,maxi)+
-          theme_bw()+ 
-          scale_fill_gradient2(low="blue", midpoint=midpoint,high="red",limits=c(-5,5)))
+    print(ggplot(bedpe, aes(x=mid1, y=mid2, fill = log(value,base=2))) + 
+            geom_tile(aes(width = w2, height=w1))+
+            xlab('X coordinate')+ 
+            ylab('Y coordinate')+
+            geom_vline(xintercept = mini)+
+            geom_vline(xintercept = maxi)+
+            geom_hline(yintercept = mini)+
+            geom_hline(yintercept = maxi)+
+            xlim(mini,maxi)+
+            ylim(mini,maxi)+
+            theme_bw()+ 
+            scale_fill_gradient2(low="blue", midpoint=midpoint,high="red",limits=c(MIN,MAX)))
   }
   if ((dim(xbeds)[1]>0) && (dim(ybeds)[1]>0)){
     print(chromo)
@@ -135,10 +133,12 @@ plot_bedpe_scores=function(bedpe,midpoint,chromo,mini,maxi,
     stopifnot(length(chromoy)>0)
     xbeds=xbeds[chromox,]
     ybeds=ybeds[chromoy,]
+    print('1')
     #I'll assume that in this case the user has inputted a good bed file
     bottom_start=ggplot(xbeds,aes(name,start,ymin=start,ymax=end,colour=name))+geom_linerange(size=10)+theme_bw()+xlab("")+ylab("")+coord_flip()
     bottom=bottom_start+guides(colour=FALSE)+theme(axis.ticks=element_blank(), axis.text.y=element_blank())+ylim(c(mini,maxi))
     #side plot
+    print('2')
     theheatmap=ggplot(bedpe, aes(x=mid1, y=mid2, fill = log(value,base=2))) + 
       geom_tile(aes(width = w2, height=w1))+
       xlab('X coordinate')+ 
@@ -152,11 +152,13 @@ plot_bedpe_scores=function(bedpe,midpoint,chromo,mini,maxi,
       guides(fill=FALSE)+
       theme_bw()+
       theme(axis.ticks= element_blank(),axis.text.y = element_blank())+
-      scale_fill_gradient2(low="blue", midpoint=midpoint,high="red",limits=c(-5,5))
+      scale_fill_gradient2(low="blue", midpoint=midpoint,high="red",limits=c(MIN,MAX))
+    print('3')
     side=ggplot(ybeds,aes(name,start,ymin=start,ymax=end,colour=name))+geom_linerange(size=10)+theme_bw()+xlab("")+ylab("")+guides(colour=FALSE)+ylim(c(mini,maxi))
+    print('4')
     grid.arrange(side,theheatmap, g_legend(bottom_start),bottom,ncol=2, nrow=2,
-                 main =paste(chromo,':',mini,'-',maxi,sep=''),
-                 heights=c(5,1.5), widths=c(1.5,5))    
+                 heights=c(5,1), widths=c(1,5))    
+    print('5')
   }
 }
 
@@ -180,6 +182,22 @@ plot_bedpe_to_pdf=function(bedpefile,chromo,mini,maxi,centervalue,out,
   plot_bedpe_scores(bedpe,centervalue,chromo,mini,maxi,xbeds,ybeds)
   dev.off()
 }
+
+#Function to show you the whole chromosome, one window at a time
+bedpe_to_rectangles_byChromosome=function(bedpefile,chromo,mini,maxi,centervalue,w,outdir,pref){
+  for (cur_mini in seq(from=mini,to=maxi,by=w)){
+    print(cur_mini)
+    cur_bedpefile=gsub('WINDOW',format(w,scientific=FALSE),gsub('MINI',format(cur_mini,scientific=FALSE),bedpefile))
+    print(cur_bedpefile)
+    rectangles=bedpe_to_rectangles(cur_bedpefile,chromo,cur_mini,cur_mini+w,centervalue)
+    outfile=paste(outdir,basename(cur_bedpefile),pref,'.bedpe',sep='')
+    write.table(rectangles,file=outfile,
+                sep='\t',quote=F,row.names=F,col.names=F)
+    system(paste('zcat -f ',outfile,' | gzip > ',outfile,'.gz',sep=''))
+    system(paste('rm ',outfile))
+  }
+}
+
 
 
 

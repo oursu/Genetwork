@@ -1,4 +1,4 @@
-require("labeling",lib="/srv/scratch/oursu/code/")
+
 
 get_click_coords=function(){
   coords <- locator(type="l")
