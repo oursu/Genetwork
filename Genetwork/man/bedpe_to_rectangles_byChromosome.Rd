@@ -35,6 +35,6 @@ ran divide_bedpe_in_windows.sh to divide the file into genomic windows
 window-level visualization, and are now ready to annotate each window.
 }
 \examples{
-bedpe_to_rectangles_byChromosome('/srv/scratch/oursu/3Dgenome/results/processed_data/HiC/counts/intra/GM12878_combined/5kb/chr21/windowData/wWINDOW/chr21_5kb.RAWobserved.norm_SQRTVC.obsOverExp_SQRTVCexpected.wMINI.gz','chr21',30000000,39000000,0,1000000)
+bedpe_to_rectangles_byChromosome('/srv/scratch/oursu/3Dgenome/results/processed_data/HiC/counts/intra/GM12878_combined/5kb/chr21/windowData/wWINDOW/chr21_5kb.RAWobserved.norm_SQRTVC.obsOverExp_SQRTVCexpected.wMINI.gz','chr21',30000000,39000000,1000000,outdir,outpref)
 }
 
