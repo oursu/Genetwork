@@ -183,14 +183,30 @@ plot_bedpe_to_pdf=function(bedpefile,chromo,mini,maxi,centervalue,out,
   dev.off()
 }
 
-#Function to show you the whole chromosome, one window at a time
-bedpe_to_rectangles_byChromosome=function(bedpefile,chromo,mini,maxi,centervalue,w,outdir,pref){
+#' Function to show you the whole chromosome, one window at a time.
+#' It assumes that you started from a bedpe format file, 
+#' ran divide_bedpe_in_windows.sh to divide the file into genomic windows 
+#' window-level visualization, and are now ready to annotate each window.
+#' 
+#' @param bedpefile A template for the bedpe files that will be read. 
+#' Substitute WINDOW for the window size, and MINI for the beginning of the current window.
+#' As example is: /srv/scratch/oursu/3Dgenome/results/processed_data/HiC/counts/intra/GM12878_combined/5kb/chr21/windowData/wWINDOW/chr21_5kb.RAWobserved.norm_SQRTVC.obsOverExp_SQRTVCexpected.wMINI.gz
+#' @param chromo Name of the chromosome. This is for making the output file.
+#' @param mini Starting position of the genomic windows to show. 
+#' @param maxi Ending position of the genomic windows to show
+#' @param w Size of windows that will be shown to you.
+#' @param outdir The name of the output directory where the output data will be stored
+#' @param pref The prefix of the files that will be created. Useful for when the same method 
+#' will be run for finding different types of elements, e.g. TADs, loops, etc., then 
+#' you can just set the prefix to "TADs", "Loops", etc.
+#' @examples bedpe_to_rectangles_byChromosome('/srv/scratch/oursu/3Dgenome/results/processed_data/HiC/counts/intra/GM12878_combined/5kb/chr21/windowData/wWINDOW/chr21_5kb.RAWobserved.norm_SQRTVC.obsOverExp_SQRTVCexpected.wMINI.gz','chr21',30000000,39000000,0,1000000)
+bedpe_to_rectangles_byChromosome=function(bedpefile,chromo,mini,maxi,w,outdir,pref){
   for (cur_mini in seq(from=mini,to=maxi,by=w)){
     print(cur_mini)
     cur_bedpefile=gsub('WINDOW',format(w,scientific=FALSE),gsub('MINI',format(cur_mini,scientific=FALSE),bedpefile))
     print(cur_bedpefile)
-    rectangles=bedpe_to_rectangles(cur_bedpefile,chromo,cur_mini,cur_mini+w,centervalue)
-    outfile=paste(outdir,basename(cur_bedpefile),pref,'.bedpe',sep='')
+    rectangles=bedpe_to_rectangles(cur_bedpefile,chromo,cur_mini,cur_mini+w,0)
+    outfile=paste(outdir,pref,basename(cur_bedpefile),'.bedpe',sep='')
     write.table(rectangles,file=outfile,
                 sep='\t',quote=F,row.names=F,col.names=F)
     system(paste('zcat -f ',outfile,' | gzip > ',outfile,'.gz',sep=''))
