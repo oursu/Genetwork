@@ -26,13 +26,15 @@ bedpe_chr=$(echo ${bedpe} | sed 's/CHROMO/'${chromo}'/g')
 mini=$(zcat -f ${genecoords}_window.bed | cut -f2)
 maxi=$(zcat -f ${genecoords}_window.bed | cut -f3)
 #prepare xbeds,ybeds
-echo "zcat -f ${enhfile} | awk '{print \$1\"\t\"\$2\"\t\"\$3\"\tenhancers\"}' | gzip > ${out}.enhancers.gz " >> ${s}
+echo "zcat -f ${enhfile} | bedtools intersect -u -a stdin -b ${genecoords}_window.bed | awk '{print \$1\"\t\"\$2\"\t\"\$3\"\tenhancers\"}' | gzip > ${out}.enhancers.gz " >> ${s}
 echo "bedtools pairtobed -type both -a ${bedpe_chr} -b ${genecoords}_window.bed | cut -f1-8 | gzip > ${out}" >> ${s}
 
 #3. Plot!
-RCODE=/srv/scratch/oursu/code/Genetwork/Genetwork/R/
+RCODE=/srv/scratch/oursu/code/Genetwork/scripts
+echo "source /srv/scratch/oursu/code/Genetwork/Genetwork.bashrc" >> ${s}
 echo "Rscript ${RCODE}/plot_bedpe_pdf.R ${out} ${chromo} ${mini} ${maxi} ${out}_plot ${out}.enhancers.gz,${genecoords} ${out}.enhancers.gz,${genecoords}" >> ${s}
-echo "rm ${out}.enhancers.gz ${genecoords} ${genecoords}_window.bed ${out}.expression" >> ${s}
+echo "rm ${genecoords}_window.bed ${out}.expression" >> ${s}
+echo "rm ${genecoords} ${out}.enhancers.gz" >> ${s}
 chmod 755 ${s}
 qsub -o ${s}.o -e ${s}.e ${s}
 
