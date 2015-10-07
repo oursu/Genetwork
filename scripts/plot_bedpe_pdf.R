@@ -101,8 +101,8 @@ plot_bedpe_scores=function(bedpe,midpoint,chromo,mini,maxi,
                                             end=numeric(),name=character()),
                            ybeds=data.frame(chr=character(),start=numeric(),
                                             end=numeric(),name=character())){
-  require("ggplot2",lib.loc="/srv/scratch/oursu/code/")
-  require("gridExtra",lib.loc="/srv/scratch/oursu/code/")
+  require("ggplot2")
+  require("gridExtra")
   g_legend<-function(a.gplot){
     tmp <- ggplot_gtable(ggplot_build(a.gplot))
     leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
@@ -132,12 +132,16 @@ plot_bedpe_scores=function(bedpe,midpoint,chromo,mini,maxi,
   if ((dim(xbeds)[1]>0) && (dim(ybeds)[1]>0)){
     print(chromo)
     print(as.character(unique(xbeds$chr)))
-    chromox=which(as.character(xbeds[,1])==as.character(chromo))
-    chromoy=which(as.character(ybeds[,1])==as.character(chromo))
+    print('xbeds')
+    print(xbeds)
+    chromox=which(as.character(xbeds[,'chr'])==as.character(chromo))
+    chromoy=which(as.character(ybeds[,'chr'])==as.character(chromo))
     stopifnot(length(chromox)>0)
     stopifnot(length(chromoy)>0)
     xbeds=xbeds[chromox,]
     ybeds=ybeds[chromoy,]
+    print('xbeds filtered')
+    print(xbeds)
     print('1')
     #I'll assume that in this case the user has inputted a good bed file
     bottom_start=ggplot(xbeds,aes(name,start,ymin=start,ymax=end,colour=name))+geom_linerange(size=10)+theme_bw()+xlab("")+ylab("")+coord_flip()
