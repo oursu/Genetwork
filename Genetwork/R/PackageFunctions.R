@@ -90,7 +90,7 @@ annotate_bedpe_with_widths=function(bedpe){
   return(bedpe)
 }
 
-plot_bedpe_scores=function(bedpe,midpoint,chromo,mini,maxi,
+plot_bedpe_scores=function(bedpe,midpoint,chromo,mini,maxi,MIN=-2,MAX=2,
                            xbeds=data.frame(chr=character(),start=numeric(),
                                             end=numeric(),name=character()),
                            ybeds=data.frame(chr=character(),start=numeric(),
@@ -106,8 +106,6 @@ plot_bedpe_scores=function(bedpe,midpoint,chromo,mini,maxi,
   
   #mini=min(c(bedpe$start1,bedpe$start2))
   #maxi=max(c(bedpe$end1,bedpe$end2))
-  MIN=-2
-  MAX=2 
   
   if (dim(xbeds)[1]==0 && (dim(ybeds)[1]==0)){
     print(ggplot(bedpe, aes(x=mid1, y=mid2, fill = log(value,base=2))) + 
@@ -161,10 +159,10 @@ plot_bedpe_scores=function(bedpe,midpoint,chromo,mini,maxi,
   }
 }
 
-bedpe_to_rectangles=function(bedpefile,chromo,mini,maxi,centervalue){
+bedpe_to_rectangles=function(bedpefile,chromo,mini,maxi,centervalue,MIN=-2,MAX=2){
   bedpe=read_bedpe(bedpefile)
   bedpe=annotate_bedpe_with_widths(bedpe)
-  plot_bedpe_scores(bedpe,centervalue,chromo,mini,maxi)
+  plot_bedpe_scores(bedpe,centervalue,chromo,mini,maxi,MIN,MAX)
   rectangles=get_rectangularized_coords(get_click_coords(),chromo,mini,maxi)
   return(rectangles)
 }
@@ -199,12 +197,12 @@ plot_bedpe_to_pdf=function(bedpefile,chromo,mini,maxi,centervalue,out,
 #' will be run for finding different types of elements, e.g. TADs, loops, etc., then 
 #' you can just set the prefix to "TADs", "Loops", etc.
 #' @examples bedpe_to_rectangles_byChromosome('/srv/scratch/oursu/3Dgenome/results/processed_data/HiC/counts/intra/GM12878_combined/5kb/chr21/windowData/wWINDOW/chr21_5kb.RAWobserved.norm_SQRTVC.obsOverExp_SQRTVCexpected.wMINI.gz','chr21',30000000,39000000,1000000,outdir,outpref)
-bedpe_to_rectangles_byChromosome=function(bedpefile,chromo,mini,maxi,w,outdir,pref){
+bedpe_to_rectangles_byChromosome=function(bedpefile,chromo,mini,maxi,w,outdir,pref,MIN=-2,MAX=2){
   for (cur_mini in seq(from=mini,to=maxi,by=w)){
     print(cur_mini)
     cur_bedpefile=gsub('WINDOW',format(w,scientific=FALSE),gsub('MINI',format(cur_mini,scientific=FALSE),bedpefile))
     print(cur_bedpefile)
-    rectangles=bedpe_to_rectangles(cur_bedpefile,chromo,cur_mini,cur_mini+w,0)
+    rectangles=bedpe_to_rectangles(cur_bedpefile,chromo,cur_mini,cur_mini+w,0,MIN,MAX)
     outfile=paste(outdir,pref,basename(cur_bedpefile),'.bedpe',sep='')
     write.table(rectangles,file=outfile,
                 sep='\t',quote=F,row.names=F,col.names=F)
