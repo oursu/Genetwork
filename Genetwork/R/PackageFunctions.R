@@ -106,6 +106,7 @@ plot_bedpe_scores=function(bedpe,midpoint,chromo,mini,maxi,MIN=-2,MAX=2,
   
   #mini=min(c(bedpe$start1,bedpe$start2))
   #maxi=max(c(bedpe$end1,bedpe$end2))
+  options(scipen=999)
   
   if (dim(xbeds)[1]==0 && (dim(ybeds)[1]==0)){
     print(ggplot(bedpe, aes(x=mid1, y=mid2, fill = log(value,base=2))) + 
